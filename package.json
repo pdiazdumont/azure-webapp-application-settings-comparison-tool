@@ -10,12 +10,22 @@
   "license": "MIT",
   "dependencies": {
     "adal-angular": "^1.0.15",
-    "msal": "^0.1.2"
+    "moment": "^2.19.1",
+    "msal": "^0.1.2",
+    "query-string": "^5.0.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^4.9.0",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-react": "^7.4.0",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.3"
   }

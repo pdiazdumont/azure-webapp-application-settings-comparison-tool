@@ -1,0 +1,47 @@
+{
+    "parser": "babel-eslint",
+    "plugins": [
+      "react"
+    ],
+    "env": {
+      "browser": true,
+      "es6": true,
+      "node": true
+    },
+    "rules": {
+      "array-bracket-spacing": [2, "never"],
+      "arrow-parens": [2, "as-needed"],
+      "arrow-spacing": 2,
+      "brace-style": [2, "stroustrup", { "allowSingleLine": true }],
+      "comma-dangle": [2, "always-multiline"],
+      "eol-last": 2,
+      "indent": [2, 2, {"SwitchCase": 1}],
+      "jsx-quotes": [2, "prefer-single"],
+      "keyword-spacing": [2, { "before": true, "after": true }],
+      "max-len": [2, 140, 4],
+      "no-underscore-dangle": [0],
+      "no-var": 2,
+      "object-shorthand": 2,
+      "prefer-arrow-callback": 2,
+      "prefer-const": 2,
+      "react/display-name": 0,
+      "react/jsx-boolean-value": 2,
+      "react/jsx-no-undef": 2,
+      "react/react-in-jsx-scope": 0,
+      "react/jsx-sort-props": 0,
+      "react/jsx-uses-react": 2,
+      "react/jsx-uses-vars": 2,
+      "react/no-did-update-set-state": 2,
+      "react/no-multi-comp": 0,
+      "react/no-unknown-property": 2,
+      "react/self-closing-comp": 2,
+      "quotes": [2, "single", {"allowTemplateLiterals": true}],
+      "semi": [2, "never"],
+      "space-before-blocks": [2, "always"],
+      "space-before-function-paren": [2, "never"],
+      "strict": [2, "global"],
+      "no-console": 0,
+      "no-unused-vars": 0
+    },
+    "extends": ["eslint:recommended", "plugin:react/recommended"]
+}

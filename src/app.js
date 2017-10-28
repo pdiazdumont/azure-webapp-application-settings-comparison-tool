@@ -1,46 +1,52 @@
-// import adal from 'adal-angular/lib/adal'
+// TEST
+import { instance as api } from './utils/api'
+import constants from './constants'
 
-window.onload = () => {
-	return
-	const config = {
-		tenant: 'pauldiazcignium.onmicrosoft.com',
-		clientId: '650eed1e-1acb-4c2d-8907-2406d6bd4d53',
-		cacheLocation: 'localStorage',
-		loginResource: 'https://management.azure.com/'
-		// endpoints: {
-		// 	'https://management.azure.com/': 'https://management.azure.com/'
-		// }
-		// popUp: true
-	}
-	const adalClient = new AuthenticationContext(config)
+const subscriptions = api.getSubscriptions(localStorage.getItem('token.value'))
 
-	if (adalClient.isCallback(window.location.hash)) {
-		adalClient.handleWindowCallback()
-	}
+subscriptions
+  .then(response => {
+    if (response.ok) {
+      console.log('success')
+    }
+    return response.json()
+  })
+  .then(response => {
+    switch (response.error.code) {
+      case constants.ERROR_CODES.INVALID_TOKEN:
+        console.log('token is invalid')
+        break
+      case constants.ERROR_CODES.EXPIRED_TOKEN:
+        console.log('token has expired')
+        break
+    }
+  })
 
-	const user = adalClient.getCachedUser()
+// // END TEST
 
-	if (!user) {
-		adalClient.login()
-	}
+import { Component } from 'react'
 
-	// adalClient.acquireToken('https://management.azure.com/', (error, token) => {
-	// 	console.log(token);
-	// })
-
-	const token = adalClient.getCachedToken(config.clientId)
-
-	const request = new Request('https://management.azure.com/subscriptions?api-version=2015-01-01', {
-		method: 'get',
-		headers: new Headers({
-			'Accept': 'application/json',
-			'Authorization': 'Bearer ' + token,
-			'Content-Type': 'application/json',
-			'Host': 'management.azure.com'
-		})
-	})
-
-	fetch(request).then((response) => {
-		// console.log(response)
-	})
+export default class App extends Component {
+  render() {
+    return (
+      <div>asds</div>
+    )
+  }
 }
+
+import adlib from 'adlib'
+
+const currentHash = window.location.hash
+
+if (adlib.isCallback(currentHash)) {
+  adlib.handleCallback(currentHash)
+}
+
+if (adlib.notSigned()) {
+  adlib.login()
+}
+
+if (adlib.tokenHasExpired()) {
+  adlib.renewToken()
+}
+
