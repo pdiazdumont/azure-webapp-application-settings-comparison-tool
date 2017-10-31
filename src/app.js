@@ -2,6 +2,13 @@
 import { instance as api } from './utils/api'
 import constants from './constants'
 
+import arraysOperation from 'array-operations'
+
+import ApplicationSettingsPanel from './components/application-settings-panel'
+
+import applicationSettings from './raw/application-settings'
+import applicationSettings2 from './raw/application-settings.2'
+
 const subscriptions = api.getSubscriptions(localStorage.getItem('token.value'))
 
 subscriptions
@@ -12,24 +19,31 @@ subscriptions
     return response.json()
   })
   .then(response => {
-    switch (response.error.code) {
-      case constants.ERROR_CODES.INVALID_TOKEN:
-        console.log('token is invalid')
-        break
-      case constants.ERROR_CODES.EXPIRED_TOKEN:
-        console.log('token has expired')
-        break
+    if (response.error) {
+      switch (response.error.code) {
+        case constants.ERROR_CODES.INVALID_TOKEN:
+          console.log('token is invalid')
+          break
+        case constants.ERROR_CODES.EXPIRED_TOKEN:
+          console.log('token has expired')
+          break
+      }
+    }
+    else {
+      // console.log(response)
     }
   })
-
-// // END TEST
+// END TEST
+// adlib.login()
 
 import { Component } from 'react'
 
 export default class App extends Component {
   render() {
     return (
-      <div>asds</div>
+      <div>
+        <ApplicationSettingsPanel baseSettings={applicationSettings.properties} applicationSettings={ applicationSettings2.properties } />
+      </div>
     )
   }
 }

@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "adal-angular": "^1.0.15",
+    "array-operations": "^1.1.0",
     "moment": "^2.19.1",
     "msal": "^0.1.2",
     "query-string": "^5.0.0",
@@ -23,9 +24,13 @@
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.7",
     "eslint": "^4.9.0",
     "eslint-loader": "^1.9.0",
     "eslint-plugin-react": "^7.4.0",
+    "node-sass": "^4.5.3",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.19.0",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.3"
   }
