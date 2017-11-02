@@ -21,7 +21,18 @@ module.exports = {
   module: {
     rules: [
       { test: /\.js|\.jsx$/, use: "babel-loader", exclude: ["/node_modules", path.resolve(__dirname, "src/adal.js")] },
-      { test: /\.js|\.jsx$/, use: "eslint-loader", exclude: ["/node_modules", path.resolve(__dirname, "src/adal.js")] }
+      { test: /\.js|\.jsx$/, use: "eslint-loader", exclude: ["/node_modules", path.resolve(__dirname, "src/adal.js")] },
+      { test: /\.scss$/, use: [
+        {
+          loader: "style-loader"
+        },
+        {
+          loader: "css-loader"
+        },
+        {
+          loader: "sass-loader"
+        },
+      ] },
     ]
   },
   resolve: {

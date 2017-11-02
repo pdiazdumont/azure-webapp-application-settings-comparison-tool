@@ -1,12 +1,15 @@
 import guid from 'uuid/v4'
+import jwt from 'jwt-decode'
 import queryString from 'query-string'
 import moment from 'moment'
 
 class AdLib {
   constructor() {
     this.config = {
-      clientId: '650eed1e-1acb-4c2d-8907-2406d6bd4d53',
-      tenant: 'pauldiazcignium.onmicrosoft.com',
+      // clientId: '650eed1e-1acb-4c2d-8907-2406d6bd4d53',
+      clientId: '79f8abb7-5356-44d9-8db5-13c656bf2290',
+      // tenant: 'pauldiazcignium.onmicrosoft.com',
+      tenant: 'Cignium.onmicrosoft.com',
       resource: 'https://management.azure.com/',
     }
   }
@@ -36,6 +39,10 @@ class AdLib {
 
     this.setItemToLocalStorage('token.value', parsedQuery.access_token)
     this.setItemToLocalStorage('token.expiresOn', moment().add(parsedQuery.expires_in, 's').format())
+
+    const tokenInfo = jwt(parsedQuery.access_token)
+    this.setItemToLocalStorage('token.user.name', tokenInfo.name)
+    this.setItemToLocalStorage('token.user.email', tokenInfo.email)
 
     window.location.href = window.location.origin
   }
