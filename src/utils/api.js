@@ -20,6 +20,31 @@ class api {
     return fetch(request)
   }
 
+  getSites(token, subscriptionId, resourceGroupName) {
+    const request = new Request(`${this.endpoint}
+    /${subscriptionId}
+    /resourceGroups/${resourceGroupName}
+    /providers/Microsoft.Web/sites/
+    ?api-version=${this.apiVersion}` , {
+      method: 'GET',
+      headers: this.getAuthenticationHeader(token),
+    })
+    return fetch(request)
+  }
+
+  getApplicationSettings(token, subscriptionId, resourceGroupName, siteName) {
+    const request = new Request(`${this.endpoint}
+    /${subscriptionId}
+    /resourceGroups/${resourceGroupName}
+    /providers/Microsoft.Web/sites/${siteName}
+    /config/appsettings/list/
+    ?api-version=${this.apiVersion}` , {
+      method: 'GET',
+      headers: this.getAuthenticationHeader(token),
+    })
+    return fetch(request)
+  }
+
   getAuthenticationHeader(token) {
     return new Headers({
       'Authorization': `Bearer ${token}`,
