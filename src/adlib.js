@@ -41,8 +41,9 @@ class AdLib {
     this.setItemToLocalStorage('token.expiresOn', moment().add(parsedQuery.expires_in, 's').format())
 
     const tokenInfo = jwt(parsedQuery.access_token)
+    console.log(tokenInfo)
     this.setItemToLocalStorage('token.user.name', tokenInfo.name)
-    this.setItemToLocalStorage('token.user.email', tokenInfo.email)
+    this.setItemToLocalStorage('token.user.email', tokenInfo.upn)
 
     window.location.href = window.location.origin
   }

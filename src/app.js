@@ -1,137 +1,119 @@
-// TEST
 import { instance as api } from './utils/api'
-import constants from './constants'
-
-// const subscriptions = api.getSubscriptions(localStorage.getItem('token.value'))
-
-// subscriptions
-//   .then(response => {
-//     if (response.ok) {
-//       console.log('success')
-//     }
-//     return response.json()
-//   })
-//   .then(response => {
-//     if (response.error) {
-//       switch (response.error.code) {
-//         case constants.ERROR_CODES.INVALID_TOKEN:
-//           console.log('token is invalid')
-//           break
-//         case constants.ERROR_CODES.EXPIRED_TOKEN:
-//           console.log('token has expired')
-//           break
-//       }
-//     }
-//     else {
-//       // console.log(response)
-//     }
-//   })
-// // END TEST
-// adlib.login()
+import cache from './utils/cache'
 
 import { Component } from 'react'
-// import applicationSettings from './raw/application-settings'
-// import applicationSettings2 from './raw/application-settings.2'
-// import ApplicationSettingsPanel from './components/application-settings-panel'
 
 export default class App extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
+      initialized: false,
+      token: localStorage.getItem('token.value'),
       subscriptions: [],
       resourceGroups: [],
-      selectedSubscription: null,
-      status: 0,
-    }
-
-    this.handleSubscriptionSelection = this.handleSubscriptionSelection.bind(this)
+    }    
   }
 
   componentDidMount() {
-    const token = localStorage.getItem('token.value')
-    api.getSubscriptions(token)
-      .then(response => {
-        return response.json()
-      })
-      .then(response => {
-        this.setState({
-          subscriptions: response.value.map((value, index) => {
-            return {
-              id: value.subscriptionId,
-              name: value.displayName,
-            }
-          }),
-        })
-      })
+    this.initialize()
   }
 
   render() {
-    return (
-      <div>
-        { this.renderSetup() }
-      </div>
-      // <div>
-      // <ApplicationSettingsPanel baseSettings={applicationSettings.properties} applicationSettings={ applicationSettings2.properties } />
-      // </div>
-    )
-  }
-
-  renderSetup() {
-    switch (this.state.status) {
-      case constants.STATUS.SETUP_SUBSCRIPTION:
-        return (
-          <div>
-            Select a subscription: 
-            <select onChange={ this.handleSubscriptionSelection }>
-              <option value='0' key='0'>-</option>
-              { this.renderSubscriptionSelection() }
-            </select>
-          </div>
-        )
-      case constants.STATUS.SETUP_RESOURCE_GROUPS:
-        return (
-          <div>
-            Current resource groups:
-            <ul>
-              { this.renderResourceGroupSelection() }
-            </ul>
-          </div>
-        )
+    if (this.state.initialized) {
+      return <div>ready</div>
+    }
+    else {
+      return <div>initializing application</div>
     }
   }
 
-  renderSubscriptionSelection() {
-    return this.state.subscriptions.map((item, index) => {
-      return <option value={ item.id } key={ item.id }>{ item.name }</option>
+  async initialize() {
+    await this.loadSubscriptions()
+    await this.loadResourceGroups()
+    this.setState({
+      initialized: true,
     })
   }
 
-  handleSubscriptionSelection(event) {
-    const subscription = event.target.value
-    const token = localStorage.getItem('token.value')
-    api.getResourceGroups(token, subscription)
-      .then(response => {
-        return response.json()
+  async loadSubscriptions() {
+    const subscriptions = cache.getSubscriptions()
+    if (subscriptions) {
+      this.setState({
+        subscriptions,
       })
-      .then(response => {
-        this.setState({
-          selectedSubscription: subscription,
-          resourceGroups: response.value.map((value, index) => {
-            return {
-              id: value.id,
-              name: value.name,
-            }
-          }),
-          status: 1,
+    }
+    else {
+      return api.getSubscriptions(this.state.token)
+        .then(response => {
+          if (response.ok && response.status === 200) {
+            return response.json()
+          }
+          return Promise.reject(new Error(`The request has failed. Code: ${response.status}, message: "${response.statusText}"`))
         })
-      })
+        .then(response => {
+          const subscriptions = response.value.map((subscription, index) => {
+            return {
+              id: subscription.subscriptionId,
+              name: subscription.displayName,
+              state: subscription.state,
+            }
+          })
+          this.setState({
+            subscriptions,
+          })
+          cache.setSubscriptions(subscriptions)
+        })
+        .catch(error => console.error(`An error has occurred: ${error}`))
+    }
   }
 
-  renderResourceGroupSelection() {
-    return this.state.resourceGroups.map((item, index) => {
-      return <li key={ item.id }>{ item.name }</li>
-    })
+  async loadResourceGroups() {
+    const resourceGroups = cache.getResourceGroups()
+    if (resourceGroups) {
+      this.setState({
+        resourceGroups,
+      })
+    }
+    else {
+      const resourceGroupInformation = []
+      const promises = this.state.subscriptions.map((subscription, index) => {
+        return api.getResourceGroups(this.state.token, subscription.id)
+          .then(response => {
+            if (response.ok && response.status === 200) {
+              return response.json()
+            }
+            return Promise.reject(new Error(`The request has failed. Code: ${response.status}, message: "${response.statusText}"`))
+          })
+          .then(response => {
+            const resourceGroups = []
+            response.value.map((resourceGroup, index) => {
+              resourceGroups.push(resourceGroup.name)
+            })
+            return Promise.resolve(resourceGroups)
+          })
+          .then(response => {
+            return {
+              subscription: subscription.name,
+              resourceGroups: response,
+            }
+          })
+      })
+  
+      return Promise
+        .all(promises)
+        .then(response => {
+          const resourceGroups = {}
+          response.map((resourceGroup, index) => {
+            resourceGroups[resourceGroup.subscription] = resourceGroup.resourceGroups
+          })
+          console.log(resourceGroups)
+          cache.setResourceGroups(resourceGroups)
+          this.setState({
+            resourceGroups,
+          })
+        })
+    }
   }
 }
 
@@ -150,4 +132,3 @@ if (adlib.notSigned()) {
 if (adlib.tokenHasExpired()) {
   adlib.renewToken()
 }
-
