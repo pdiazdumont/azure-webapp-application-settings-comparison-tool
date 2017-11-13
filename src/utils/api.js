@@ -1,3 +1,5 @@
+import queryString from 'query-string'
+
 class api {
   constructor() {
     this.endpoint = 'https://management.azure.com/subscriptions'
@@ -17,6 +19,17 @@ class api {
       method: 'GET',
       headers: this.getAuthenticationHeader(token),
     })
+    return fetch(request)
+  }
+
+  getSitesForSubscription(token, subscriptionId) {
+    const filter = {
+      '$filter': 'resourceType eq \'Microsoft.Web/sites\'',
+    }
+    const request = new Request(`${this.endpoint}
+    /${subscriptionId},
+    /resources?
+    ${queryString.stringify(filter)}`)
     return fetch(request)
   }
 
