@@ -7,12 +7,12 @@ export default class WebApp extends Component {
 
     this.state = {
       resourceGroup: null,
-      application: null
+      application: null,
     }
   }
 
   render() {
-
+    return <div>webapp</div>
   }
 
   renderResourceGroupDropdown() {

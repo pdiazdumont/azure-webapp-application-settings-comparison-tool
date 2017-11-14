@@ -26,6 +26,20 @@ const cache = {
     const user = localStorage.getItem('token.user.email')
     localStorage.setItem(`${user}.resourceGroups`, JSON.stringify(resourceGroups))
   },
+
+  getSites() {
+    const user = localStorage.getItem('token.user.email')
+    const sites = localStorage.getItem(`${user}.sites`)
+    if (sites) {
+      return JSON.parse(sites)
+    }
+    return false
+  },
+
+  setSites(sites) {
+    const user = localStorage.getItem('token.user.email')
+    localStorage.setItem(`${user}.sites`, JSON.stringify(sites))
+  },
 }
 
 export default cache

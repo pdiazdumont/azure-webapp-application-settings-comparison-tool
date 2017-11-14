@@ -1,6 +1,8 @@
 import { instance as api } from './utils/api'
 import cache from './utils/cache'
 
+import Workspace from './components/workspace'
+
 import { Component } from 'react'
 
 export default class App extends Component {
@@ -12,6 +14,7 @@ export default class App extends Component {
       token: localStorage.getItem('token.value'),
       subscriptions: [],
       resourceGroups: [],
+      sites: [],
     }    
   }
 
@@ -21,7 +24,7 @@ export default class App extends Component {
 
   render() {
     if (this.state.initialized) {
-      return <div>ready</div>
+      return <Workspace />
     }
     else {
       return <div>initializing application</div>
@@ -31,6 +34,7 @@ export default class App extends Component {
   async initialize() {
     await this.loadSubscriptions()
     await this.loadResourceGroups()
+    await this.loadSites()
     this.setState({
       initialized: true,
     })
@@ -107,10 +111,64 @@ export default class App extends Component {
           response.map((resourceGroup, index) => {
             resourceGroups[resourceGroup.subscription] = resourceGroup.resourceGroups
           })
-          console.log(resourceGroups)
           cache.setResourceGroups(resourceGroups)
           this.setState({
             resourceGroups,
+          })
+        })
+    }
+  }
+
+  async loadSites() {
+    const sites = cache.getSites()
+    if (sites) {
+      this.setState({
+        sites,
+      })
+    }
+    else {
+      const promises = this.state.subscriptions.map((subscription, index) => {
+        return api.getSitesForSubscription(this.state.token, subscription.id)
+          .then(response => {
+            if (response.ok && response.status == 200) {
+              return response.json()
+            }
+            return Promise.reject(new Error(`The request has failed. Code: ${response.status}, message: "${response.statusText}"`))
+          })
+          .then(response => {
+            const sites = response.value.map((site, index) => {
+              const regex = new RegExp(
+                `/subscriptions` +
+                `/${subscription.id}` +
+                `/resourceGroups` +
+                `/([a-zA-Z0-9_-]+)` +
+                `/providers` +
+                `/Microsoft.Web` +
+                `/sites` +
+                `/([a-zA-Z0-9_-]+)`, 'i')
+              const results = site.id.match(regex)
+              return {
+                id: results[2],
+                name: site.name,
+                resourceGroup: results[1],
+              }
+            })
+            return Promise.resolve(sites)
+          })
+      })
+  
+      return Promise
+        .all(promises)
+        .then(response => {
+          const sites = []
+          response.map((value, index) => {
+            value.map((site, index) => {
+              sites.push(site)
+            })
+          })
+          cache.setSites(sites)
+          this.setState({
+            sites,
           })
         })
     }

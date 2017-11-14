@@ -26,19 +26,23 @@ class api {
     const filter = {
       '$filter': 'resourceType eq \'Microsoft.Web/sites\'',
     }
-    const request = new Request(`${this.endpoint}
-    /${subscriptionId},
-    /resources?
-    ${queryString.stringify(filter)}`)
+    const request = new Request(`${this.endpoint}` +
+    `/${subscriptionId}` +
+    `/resources` +
+    `?api-version=${this.apiVersion}` +
+    `&${queryString.stringify(filter)}`, {
+      method: 'GET',
+      headers: this.getAuthenticationHeader(token),
+    })
     return fetch(request)
   }
 
   getSites(token, subscriptionId, resourceGroupName) {
-    const request = new Request(`${this.endpoint}
-    /${subscriptionId}
-    /resourceGroups/${resourceGroupName}
-    /providers/Microsoft.Web/sites/
-    ?api-version=${this.apiVersion}` , {
+    const request = new Request(`${this.endpoint}` +
+    `/${subscriptionId}` +
+    `/resourceGroups/${resourceGroupName}` +
+    `/providers/Microsoft.Web/sites/` +
+    `?api-version=${this.apiVersion}`, {
       method: 'GET',
       headers: this.getAuthenticationHeader(token),
     })
